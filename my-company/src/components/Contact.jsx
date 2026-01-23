@@ -11,7 +11,7 @@ function Contact() {
 
       <input
         type="text"
-        placeholder="Name"
+        placeholder="Your Name"
         value={name}
         onChange={(e) => setName(e.target.value)}
         style={{ display: "block", margin: "10px 0" }}
@@ -19,20 +19,22 @@ function Contact() {
 
       <input
         type="email"
-        placeholder="Email"
+        placeholder="Your Email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         style={{ display: "block", margin: "10px 0" }}
       />
 
       <textarea
-        placeholder="Message"
+        placeholder="Your Message"
         value={message}
         onChange={(e) => setMessage(e.target.value)}
         style={{ display: "block", margin: "10px 0" }}
       />
 
-      <button>Send</button>
+      <button style={{ padding: "8px 12px" }}>
+        Send Message
+      </button>
     </div>
   );
 }
