@@ -3,6 +3,9 @@ import { useRecipeStore } from './recipeStore';
 
 const RecipeList = () => {
   const recipes = useRecipeStore((state) => state.filteredRecipes);
+  const addFavorite = useRecipeStore((state) => state.addFavorite);
+  const removeFavorite = useRecipeStore((state) => state.removeFavorite);
+  const favorites = useRecipeStore((state) => state.favorites);
 
   return (
     <div>
@@ -14,6 +17,24 @@ const RecipeList = () => {
           <p>{recipe.description}</p>
 
           <Link to={`/recipes/${recipe.id}`}>View Details</Link>
+
+          <br />
+
+          {favorites.includes(recipe.id) ? (
+            <button
+              onClick={() => removeFavorite(recipe.id)}
+              style={{ marginTop: '10px' }}
+            >
+              Remove from Favorites
+            </button>
+          ) : (
+            <button
+              onClick={() => addFavorite(recipe.id)}
+              style={{ marginTop: '10px' }}
+            >
+              Add to Favorites
+            </button>
+          )}
         </div>
       ))}
     </div>

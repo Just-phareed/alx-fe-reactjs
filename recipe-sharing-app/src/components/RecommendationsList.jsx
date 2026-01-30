@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { useRecipeStore } from './recipeStore';
 
 const RecommendationsList = () => {
@@ -7,19 +6,19 @@ const RecommendationsList = () => {
     (state) => state.generateRecommendations
   );
 
-  useEffect(() => {
-    generateRecommendations();
-  }, []);
-
   return (
     <div>
-      <h2>Recommended for You</h2>
+      <h2>Recommended Recipes</h2>
 
-      {recommendations.length === 0 && <p>No recommendations yet.</p>}
+      <button onClick={generateRecommendations}>
+        Generate Recommendations
+      </button>
+
+      {recommendations.length === 0 && <p>No recommendations yet</p>}
 
       {recommendations.map((recipe) => (
         <div key={recipe.id}>
-          <h4>{recipe.title}</h4>
+          <h3>{recipe.title}</h3>
           <p>{recipe.description}</p>
         </div>
       ))}
