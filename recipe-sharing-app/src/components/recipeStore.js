@@ -2,44 +2,56 @@ import { create } from 'zustand';
 
 export const useRecipeStore = create((set, get) => ({
   recipes: [],
-  favorites: [],
-  recommendations: [],
+  filteredRecipes: [],
+  searchTerm: '',
+
+  setRecipes: (recipes) =>
+    set({
+      recipes,
+      filteredRecipes: recipes,
+    }),
 
   addRecipe: (newRecipe) =>
-    set((state) => ({
-      recipes: [...state.recipes, newRecipe],
-    })),
+    set((state) => {
+      const updatedRecipes = [...state.recipes, newRecipe];
+      return {
+        recipes: updatedRecipes,
+        filteredRecipes: updatedRecipes,
+      };
+    }),
 
   deleteRecipe: (id) =>
-    set((state) => ({
-      recipes: state.recipes.filter((recipe) => recipe.id !== id),
-      favorites: state.favorites.filter((favId) => favId !== id),
-    })),
+    set((state) => {
+      const updatedRecipes = state.recipes.filter(
+        (recipe) => recipe.id !== id
+      );
+      return {
+        recipes: updatedRecipes,
+        filteredRecipes: updatedRecipes,
+      };
+    }),
 
   updateRecipe: (updatedRecipe) =>
-    set((state) => ({
-      recipes: state.recipes.map((recipe) =>
+    set((state) => {
+      const updatedRecipes = state.recipes.map((recipe) =>
         recipe.id === updatedRecipe.id ? updatedRecipe : recipe
-      ),
-    })),
+      );
+      return {
+        recipes: updatedRecipes,
+        filteredRecipes: updatedRecipes,
+      };
+    }),
 
-  addFavorite: (recipeId) =>
-    set((state) => ({
-      favorites: [...state.favorites, recipeId],
-    })),
+  setSearchTerm: (term) =>
+    set({ searchTerm: term }),
 
-  removeFavorite: (recipeId) =>
-    set((state) => ({
-      favorites: state.favorites.filter((id) => id !== recipeId),
-    })),
+  filterRecipes: () => {
+    const { recipes, searchTerm } = get();
 
-  generateRecommendations: () => {
-    const { recipes, favorites } = get();
-
-    const recommended = recipes.filter(
-      (recipe) => !favorites.includes(recipe.id)
+    const filtered = recipes.filter((recipe) =>
+      recipe.title.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-    set({ recommendations: recommended.slice(0, 3) });
+    set({ filteredRecipes: filtered });
   },
 }));

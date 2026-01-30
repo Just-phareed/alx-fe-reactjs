@@ -3,35 +3,19 @@ import { useRecipeStore } from './recipeStore';
 
 const RecipeList = () => {
   const recipes = useRecipeStore((state) => state.filteredRecipes);
-  const favorites = useRecipeStore((state) => state.favorites);
-  const addFavorite = useRecipeStore((state) => state.addFavorite);
-  const removeFavorite = useRecipeStore((state) => state.removeFavorite);
 
   return (
     <div>
-      {recipes.map((recipe) => {
-        const isFavorite = favorites.includes(recipe.id);
+      {recipes.length === 0 && <p>No recipes found.</p>}
 
-        return (
-          <div key={recipe.id} style={{ marginBottom: '20px' }}>
-            <h3>{recipe.title}</h3>
-            <p>{recipe.description}</p>
+      {recipes.map((recipe) => (
+        <div key={recipe.id} style={{ marginBottom: '20px' }}>
+          <h3>{recipe.title}</h3>
+          <p>{recipe.description}</p>
 
-            <button
-              onClick={() =>
-                isFavorite
-                  ? removeFavorite(recipe.id)
-                  : addFavorite(recipe.id)
-              }
-            >
-              {isFavorite ? 'Remove from Favorites' : 'Add to Favorites'}
-            </button>
-
-            <br />
-            <Link to={`/recipes/${recipe.id}`}>View Details</Link>
-          </div>
-        );
-      })}
+          <Link to={`/recipes/${recipe.id}`}>View Details</Link>
+        </div>
+      ))}
     </div>
   );
 };
