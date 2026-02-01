@@ -1,60 +1,126 @@
 import { useState } from 'react';
-import { fetchUserData } from '../services/githubService';
+import { searchUsersAdvanced } from '../services/githubService';
 
 function Search() {
   const [username, setUsername] = useState('');
-  const [user, setUser] = useState(null);
+  const [location, setLocation] = useState('');
+  const [minRepos, setMinRepos] = useState('');
+  const [users, setUsers] = useState([]);
+  const [page, setPage] = useState(1);
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (!username) return;
-
     setLoading(true);
     setError('');
-    setUser(null);
+    setUsers([]);
+    setPage(1);
 
     try {
-      const data = await fetchUserData(username);
-      setUser(data);
+      const data = await searchUsersAdvanced({
+        username,
+        location,
+        minRepos,
+        page: 1
+      });
+      setUsers(data.items || []);
     } catch (err) {
-      setError("Looks like we cant find the user");
+      setError('Looks like we cant find the user');
     } finally {
       setLoading(false);
     }
   };
 
+  const loadMore = async () => {
+    const nextPage = page + 1;
+    setPage(nextPage);
+
+    const data = await searchUsersAdvanced({
+      username,
+      location,
+      minRepos,
+      page: nextPage
+    });
+
+    setUsers((prev) => [...prev, ...data.items]);
+  };
+
   return (
-    <div style={{ marginBottom: '20px' }}>
-      <form onSubmit={handleSubmit}>
+    <div className="max-w-xl mx-auto">
+      <form
+        onSubmit={handleSubmit}
+        className="bg-white shadow-md rounded p-4 mb-6 space-y-3"
+      >
         <input
+          className="w-full border p-2 rounded"
           type="text"
-          placeholder="Search GitHub username"
+          placeholder="Username"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
-          style={{ padding: '8px', marginRight: '10px' }}
         />
-        <button type="submit">Search</button>
+
+        <input
+          className="w-full border p-2 rounded"
+          type="text"
+          placeholder="Location (e.g. Nigeria)"
+          value={location}
+          onChange={(e) => setLocation(e.target.value)}
+        />
+
+        <input
+          className="w-full border p-2 rounded"
+          type="number"
+          placeholder="Minimum repositories"
+          value={minRepos}
+          onChange={(e) => setMinRepos(e.target.value)}
+        />
+
+        <button
+          type="submit"
+          className="w-full bg-black text-white py-2 rounded"
+        >
+          Search
+        </button>
       </form>
 
-      {loading && <p>Loading...</p>}
-      {error && <p>{error}</p>}
+      {loading && <p className="text-center">Loading...</p>}
+      {error && <p className="text-center text-red-500">{error}</p>}
 
-      {user && (
-        <div style={{ marginTop: '20px' }}>
-          <img
-            src={user.avatar_url}
-            alt={user.login}
-            width="100"
-            style={{ borderRadius: '50%' }}
-          />
-          <h3>{user.name || user.login}</h3>
-          <a href={user.html_url} target="_blank" rel="noreferrer">
-            View GitHub Profile
-          </a>
-        </div>
+      <div className="space-y-4">
+        {users.map((user) => (
+          <div
+            key={user.id}
+            className="flex items-center gap-4 border p-3 rounded"
+          >
+            <img
+              src={user.avatar_url}
+              alt={user.login}
+              className="w-16 h-16 rounded-full"
+            />
+            <div>
+              <h3 className="font-semibold">{user.login}</h3>
+              <a
+                href={user.html_url}
+                target="_blank"
+                rel="noreferrer"
+                className="text-blue-600 text-sm"
+              >
+                View Profile
+              </a>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {users.length > 0 && (
+        <button
+          onClick={loadMore}
+          className="mt-4 w-full border py-2 rounded"
+        >
+          Load More
+        </button>
       )}
     </div>
   );
